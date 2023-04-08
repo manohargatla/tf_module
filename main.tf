@@ -148,6 +148,7 @@ resource "null_resource" "spc1" {
   triggers = {
     rollout_versions = var.lb_vpc_info.rollout_versions
   }
+}
   connection {
     type = "ssh"
     user = "ubuntu"
