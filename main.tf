@@ -98,7 +98,7 @@ resource "aws_instance" "red" {
   subnet_id                   = aws_subnet.lb_subnet[0].id
   vpc_security_group_ids      = [aws_security_group.terraformlb.id]
   key_name                    = "terraform3"
-  user_data                   = file("./day10/tf_modules/spc.sh")
+  user_data                   = file("spc.sh")
   tags = {
     Name = "red"
   }
@@ -108,25 +108,26 @@ resource "aws_instance" "red" {
 }
 
 ## create null resoure
-  resource "null_resource" "spc" {
+resource "null_resource" "spc" {
   triggers = {
     rollout_versions = var.lb_vpc_info.rollout_versions
   }
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
-    host = aws_instance.red.public_ip
+    host        = aws_instance.red.public_ip
   }
   provisioner "remote-exec" {
-  inline = [
-    "sudo apt update",
-    "sudo apt install openjdk-17-jdk maven -y",
-    "git clone https://github.com/spring-projects/spring-petclinic.git",
-    "cd spring-petclinic",
-    "./mvn package",
-  ]
-}
+    inline = [
+      "sudo apt update",
+      "sudo apt install openjdk-17-jdk maven -y",
+      "git clone https://github.com/spring-projects/spring-petclinic.git",
+      "cd spring-petclinic",
+      "mvn package",
+      "java -jar target/spring-petclinic-3.0.0-SNAPSHOT.jar"
+    ]
+  }
 }
 resource "aws_instance" "green" {
   instance_type               = "t2.micro"
@@ -135,7 +136,7 @@ resource "aws_instance" "green" {
   subnet_id                   = aws_subnet.lb_subnet[1].id
   vpc_security_group_ids      = [aws_security_group.terraformlb.id]
   key_name                    = "terraform3"
-  user_data                   = file("./day10/tf_modules/spc1.sh")
+  user_data                   = file("spc1.sh")
   tags = {
     Name = "green"
   }
@@ -149,19 +150,20 @@ resource "null_resource" "spc1" {
     rollout_versions = var.lb_vpc_info.rollout_versions
   }
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
-    host = aws_instance.green.public_ip
+    host        = aws_instance.green.public_ip
   }
   provisioner "remote-exec" {
-  inline = [
-    "sudo apt update",
-    "sudo apt install openjdk-17-jdk maven -y",
-    "git clone https://github.com/spring-projects/spring-petclinic.git",
-    "cd spring-petclinic",
-    "./mvn package",
-  ]
+    inline = [
+      "sudo apt update",
+      "sudo apt install openjdk-17-jdk maven -y",
+      "git clone https://github.com/spring-projects/spring-petclinic.git",
+      "cd spring-petclinic",
+      "mvn package",
+      "java -jar target/spring-petclinic-3.0.0-SNAPSHOT.jar"
+    ]
+  }
 }
-}
-  
+
